@@ -69,7 +69,6 @@ module.exports = (robot) ->
     robot.logger.debug "github-repo-event-notifier: Processing event type: \"#{eventType}\"..."
 
     try
-
       filter_parts = eventTypes
         .filter (e) ->
           # should always be at least two parts, from eventTypes creation above

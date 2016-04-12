@@ -22,6 +22,12 @@ extractMentionsFromBody = (body) ->
   else
     ""
 
+githubSlackMapping = (nick) ->
+  userMap = JSON.parse process.env['HUBOT_GITHUB_EVENT_NOTIFIER_USERMAP']
+  robot.logger.debug userMap
+  return if userMap[nick] then userMap[nick] else nick
+
+
 module.exports =
   commit_comment: (data, callback) ->
     comment = data.comment
@@ -185,12 +191,19 @@ module.exports =
     repo = data.repository
     sender = data.sender
 
-    return unless data.label? && data.label.name is 'HIGH PRIORITY'
+    return unless data.label? and data.label.name is 'HIGH PRIORITY'
 
-    msg = """
-      @here: #{pull_req.user.login} has a PR that needs a CR!
-      \n\##{data.number} \"#{pull_req.title}\"\n#{pull_req.html_url}
-    """
+    if pull_req.assignee.login isnt pull_req.user.login
+      msg = """
+        @#{githubSlackMapping(pull_req.user.login)} has a PR
+        for @#{githubSlackMapping(pull_req.assignee.login)}!
+      """
+    else
+      msg = """
+        @#{githubSlackMapping(pull_req.user.login)} has a PR ready for review!
+      """
+
+    msg = "#{msg}\n\##{data.number} \"#{pull_req.title}\"\n#{pull_req.html_url}"
 
     callback msg
 
