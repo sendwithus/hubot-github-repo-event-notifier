@@ -23,8 +23,8 @@ extractMentionsFromBody = (body) ->
     ""
 
 githubSlackMapping = (nick) ->
-  userMap = JSON.parse process.env['HUBOT_GITHUB_EVENT_NOTIFIER_USERMAP']
-  robot.logger.debug userMap
+  userMap = process.env['HUBOT_GITHUB_EVENT_NOTIFIER_USERMAP']
+  console.log userMap
   return if userMap[nick] then userMap[nick] else nick
 
 
