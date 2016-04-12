@@ -24,8 +24,12 @@ extractMentionsFromBody = (body) ->
 
 githubSlackMapping = (nick) ->
   userMap = process.env['HUBOT_GITHUB_EVENT_NOTIFIER_USERMAP']
-  console.log userMap
-  return if userMap[nick] then userMap[nick] else nick
+  userMap = JSON.parse userMap.replace /\s+?/g, ''
+  if userMap[nick]
+    userMap[nick]
+  else
+    nick
+
 
 
 module.exports =
@@ -193,17 +197,14 @@ module.exports =
 
     return unless data.label? and data.label.name is 'HIGH PRIORITY'
 
-    if pull_req.assignee.login isnt pull_req.user.login
-      msg = """
-        @#{githubSlackMapping(pull_req.user.login)} has a PR
-        for @#{githubSlackMapping(pull_req.assignee.login)}!
-      """
-    else
-      msg = """
-        @#{githubSlackMapping(pull_req.user.login)} has a PR ready for review!
-      """
+    msg = "<@#{githubSlackMapping(pull_req.user.login)}> has a PR"
 
-    msg = "#{msg}\n\##{data.number} \"#{pull_req.title}\"\n#{pull_req.html_url}"
+    if pull_req.assignee.login isnt pull_req.user.login
+      msg = "#{msg} for <@#{githubSlackMapping(pull_req.assignee.login)}>!"
+    else
+      msg = "#{msg} ready for review!"
+
+    msg = "#{msg}\n#{pull_req.title}\n#{pull_req.html_url}"
 
     callback msg
 
