@@ -199,7 +199,7 @@ module.exports =
 
     msg = "<@#{githubSlackMapping(pull_req.user.login)}> has a PR"
 
-    if pull_req.assignee.login isnt pull_req.user.login
+    if pull_req.assignee?.login? isnt pull_req.user?.login?
       msg = "#{msg} for <@#{githubSlackMapping(pull_req.assignee.login)}>!"
     else
       msg = "#{msg} ready for review!"
