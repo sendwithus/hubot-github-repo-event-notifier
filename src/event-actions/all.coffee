@@ -195,11 +195,15 @@ module.exports =
     repo = data.repository
     sender = data.sender
 
+    # noop unless there is a `HIGH PRIORITY` label on the PR
     return unless data.label? and data.label.name is 'HIGH PRIORITY'
+
+    # noop unless there is a pull_req assignee and a user on the PR
+    return unless pull_req.assignee? and pull_req.user?
 
     msg = "<@#{githubSlackMapping(pull_req.user.login)}> has a PR"
 
-    if pull_req.assignee?.login? isnt pull_req.user?.login?
+    if pull_req.assignee.login? isnt pull_req.user.login?
       msg = "#{msg} for <@#{githubSlackMapping(pull_req.assignee.login)}>!"
     else
       msg = "#{msg} ready for review!"
